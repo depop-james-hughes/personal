@@ -1,7 +1,7 @@
 const {exec} = require('child_process');
 
-// timing test
-getAllWords(function(allWords) {
+// timing test suite to compare different algorithms
+getAllWords(function (allWords) {
 
     // see how long multiple attempts take
     let avgTime = 0.0;
@@ -9,7 +9,7 @@ getAllWords(function(allWords) {
     var start = new Date().getTime();
     let attempts = 0;
 
-    for(let i = 0; i < totalSolves; i++) {
+    for (let i = 0; i < totalSolves; i++) {
         // attempts += solveGeneric(allWords, getValidWordsV3)
         // attempts += solveGeneric(allWords, getValidWordsV2)
         // attempts += solveGeneric(allWords, getValidWordsV1)
@@ -18,13 +18,17 @@ getAllWords(function(allWords) {
 
     const end = new Date().getTime();
     const time = end - start;
-    console.log(`Avg attempts to solve ${totalSolves} puzzels was: ${attempts/totalSolves}, took ${time}ms`)
+    console.log(`Avg attempts to solve ${totalSolves} puzzels was: ${attempts / totalSolves}, took ${time}ms`)
 })
 
+// Run a single solve
 // getAllWords(function (allWords) {
 //     solveGeneric(allWords, getValidWordsV4, true)
 // })
 
+// Generic solver wrapper
+// Generates a random answer, uses the valid word algorithm to narrow down to the solutions
+//
 function solveGeneric(allWords, validWordFunction, shouldLog) {
     // const answer = allWords[getRandomInt(0, allWords.length)]
     const answer = 'favor'
@@ -64,11 +68,13 @@ function solveGeneric(allWords, validWordFunction, shouldLog) {
     return attempts
 }
 
+// heat up your cpu with this one
 function getValidWordsV1(validWords) {
     return validWords;
 }
 
 
+// learn using correct letters
 function getValidWordsV2(validWords, correctLetters) {
     let newWords = [];
     for (let word of validWords) {
@@ -82,6 +88,7 @@ function getValidWordsV2(validWords, correctLetters) {
     return newWords;
 }
 
+// learning using correct letters, and letter placement
 function getValidWordsV3(validWords, correctLetters, correctPositions) {
     let newWords = [];
     const correctPositionCount = correctPositions.filter(function (x) {
@@ -106,12 +113,12 @@ function getValidWordsV3(validWords, correctLetters, correctPositions) {
     return newWords;
 }
 
+// Learn with letters, placement, and removing invalid letters
 function getValidWordsV4(validWords, correctLetters, correctPositions, invalidLetters, guesses) {
     let newWords = [];
     const correctPositionCount = correctPositions.filter(function (x) {
         return x !== "_"
     }).length;
-
 
     for (let word of validWords) {
 
@@ -143,7 +150,7 @@ function getValidWordsV4(validWords, correctLetters, correctPositions, invalidLe
     return newWords;
 }
 
-
+// For a given guess and answer, return info about the word
 function checkWord(guess, answer, correctLetters, correctPositions, invalidLetters) {
     // if we didn't get the right word, did we get any letters in the right place
     for (let gl = 0; gl < guess.length; gl++) {
@@ -175,6 +182,7 @@ function checkWord(guess, answer, correctLetters, correctPositions, invalidLette
     return correctLetters, correctPositions, invalidLetters
 }
 
+// Check if a word contains all letters in a list
 function letterTest(correctLetters, word) {
     let wordHasAllLetters = true;
 
@@ -195,6 +203,7 @@ function letterTest(correctLetters, word) {
     return wordHasAllLetters
 }
 
+// Check if a word contains all letters in a list in the same position
 function positionCheck(word, correctPositions) {
     let wordInCorrectPosition = false;
     for (let k = 0; k < correctPositions.length; k++) {
@@ -227,7 +236,7 @@ function invalidLetterCheck(word, invalidLetters) {
     return containsInvalidLetter
 }
 
-// Get all the possible words from /usr/share/dict/words
+// Get all the possible 5 letter words from /usr/share/dict/words
 function getAllWords(cb) {
     const getAllWordsCmd = "cat /usr/share/dict/words | grep -x '^[a-z]\\{5,5\\}'";
     exec(getAllWordsCmd, (error, stdout, stderr) => {
@@ -236,7 +245,7 @@ function getAllWords(cb) {
             return;
         }
 
-        allWords = stdout.split("\n");
+        const allWords = stdout.split("\n");
         console.log(`Found ${allWords.length} possible 5 letter words`)
 
         cb(allWords)
